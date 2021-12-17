@@ -1,0 +1,7 @@
+botToken: "**************"
+photoConfigs:
+  bb:
+    url: http://*****
+    previewUrl: http://******
+supportChatIds:
+  - 1111111111
