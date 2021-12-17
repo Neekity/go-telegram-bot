@@ -9,12 +9,18 @@ import (
 var Conf Config
 
 type Config struct {
-	BotToken       string                 `yaml:"botToken"`
-	PhotoConfigs   map[string]PhotoConfig `yaml:"photoConfigs"`
-	SupportChatIds []int64                `yaml:"supportChatIds"`
+	BotToken        string                    `yaml:"botToken"`
+	PhotoConfigs    map[string]PhotoConfig    `yaml:"photoConfigs"`
+	SupportChatIds  []int64                   `yaml:"supportChatIds"`
+	ResourceConfigs map[string]ResourceConfig `yaml:"resourceConfigs"`
 }
 
 type PhotoConfig struct {
+	Url        string `yaml:"url"`
+	PreviewUrl string `yaml:"previewUrl"`
+}
+
+type ResourceConfig struct {
 	Url        string `yaml:"url"`
 	PreviewUrl string `yaml:"previewUrl"`
 }

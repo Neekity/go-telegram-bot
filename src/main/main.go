@@ -34,6 +34,9 @@ func main() {
 				internal.SendPhotos(bot, update.Message.Chat.ID, plugins.GetRandomPic("bb", update.Message.Text[2:]))
 			case "bt":
 				internal.SendPhotos(bot, update.Message.Chat.ID, plugins.GetRandomPic2("bt", update.Message.Text[2:]))
+			case "as":
+				internal.SendResources(bot, update.Message.Chat.ID, plugins.GetRandomResource("as", update.Message.Text[2:]))
+
 			case "error":
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "errors")
 				msg.ReplyToMessageID = update.Message.MessageID
