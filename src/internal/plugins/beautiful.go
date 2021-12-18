@@ -20,40 +20,40 @@ type CountPic struct {
 	Count int `json:"count"`
 }
 
-func GetRandomPic(commamd string, count string) []string {
+func GetRandomPic(commamd string, count string) ([]string, error) {
 	resp, err := http.Get(config.Conf.PhotoConfigs[commamd].PreviewUrl + count)
 	if err != nil {
-		log.Panic(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Panic(err)
+		return nil, err
 	}
 	var randomPics []RandomPic
 	if err := json.Unmarshal(body, &randomPics); err != nil {
-		log.Panic(err)
+		return nil, err
 	}
 	var result []string
 	for _, randomPic := range randomPics {
 		result = append(result, config.Conf.PhotoConfigs[commamd].Url+randomPic.Preview)
 	}
-	return result
+	return result, nil
 }
 
-func GetRandomPic2(commamd string, count string) []string {
+func GetRandomPic2(commamd string, count string) ([]string, error) {
 	resp, err := http.Get(config.Conf.PhotoConfigs[commamd].PreviewUrl + "count")
 	if err != nil {
-		log.Panic(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Panic(err)
+		return nil, err
 	}
 	var picAllCount []CountPic
 	if err := json.Unmarshal(body, &picAllCount); err != nil {
-		log.Panic(err)
+		return nil, err
 	}
 	reCount, _ := strconv.Atoi(count)
 	randomPicIds := generateRandomNumber(1, picAllCount[0].Count, reCount)
@@ -73,7 +73,7 @@ func GetRandomPic2(commamd string, count string) []string {
 		log.Println(randomPic)
 		result = append(result, config.Conf.PhotoConfigs[commamd].Url+randomPic[0].Preview)
 	}
-	return result
+	return result, nil
 }
 
 //生成count个[start,end)结束的不重复的随机数

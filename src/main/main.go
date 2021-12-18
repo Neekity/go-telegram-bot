@@ -25,18 +25,37 @@ func main() {
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			command := update.Message.Text[0:2]
-			if !php2go.InArray(update.Message.Chat.ID, configType.Conf.SupportChatIds) {
+			var command string
+			if !php2go.InArray(update.Message.Chat.ID, configType.Conf.SupportChatIds) || len(update.Message.Text) < 3 {
 				command = "error"
 			}
+			command = update.Message.Text[0:2]
 			switch command {
 			case "bb":
-				internal.SendPhotos(bot, update.Message.Chat.ID, plugins.GetRandomPic("bb", update.Message.Text[2:]))
+				urls, err := plugins.GetRandomPic("bb", update.Message.Text[2:])
+				if err != nil {
+					internal.SendError(bot, update.Message.Chat.ID, err)
+				}
+				internal.SendPhotos(bot, update.Message.Chat.ID, urls)
 			case "bt":
-				internal.SendPhotos(bot, update.Message.Chat.ID, plugins.GetRandomPic2("bt", update.Message.Text[2:]))
+				urls, err := plugins.GetRandomPic2("bt", update.Message.Text[2:])
+				if err != nil {
+					internal.SendError(bot, update.Message.Chat.ID, err)
+				}
+				internal.SendPhotos(bot, update.Message.Chat.ID, urls)
 			case "as":
-				internal.SendResources(bot, update.Message.Chat.ID, plugins.GetRandomResource("as", update.Message.Text[2:]))
+				resources, err := plugins.GetRandomResource("as", update.Message.Text[2:])
+				if err != nil {
+					internal.SendError(bot, update.Message.Chat.ID, err)
+				}
 
+				internal.SendResources(bot, update.Message.Chat.ID, resources)
+			case "ab":
+				resources, err := plugins.GetRankResource("ab", update.Message.Text[2:])
+				if err != nil {
+					internal.SendError(bot, update.Message.Chat.ID, err)
+				}
+				internal.SendResources(bot, update.Message.Chat.ID, resources)
 			case "error":
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "errors")
 				msg.ReplyToMessageID = update.Message.MessageID

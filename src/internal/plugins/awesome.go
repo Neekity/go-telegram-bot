@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"neekity.com/go-telegram-bot/src/internal/config"
 	"net/http"
 	"sync"
@@ -15,26 +14,48 @@ type RandomResource struct {
 	FileExt string `json:"file_ext"`
 }
 
-func GetRandomResource(command string, query string) []RandomResource {
+func GetRankResource(command string, query string) ([]RandomResource, error) {
+	var results []RandomResource
+	url := fmt.Sprintf(config.Conf.ResourceConfigs[command].PreviewUrl, query)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(body, &results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func GetRandomResource(command string, query string) ([]RandomResource, error) {
 	var results []RandomResource
 	var wg sync.WaitGroup
-	wg.Add(10)
+	var erRrr error
 	for i := 0; i < 10; i++ {
+		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			url := fmt.Sprintf(config.Conf.ResourceConfigs[command].PreviewUrl, query)
 			resp, err := http.Get(url)
 			if err != nil {
-				log.Panic(err)
+				erRrr = err
+				return
 			}
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				log.Panic(err)
+				erRrr = err
+				return
 			}
 			var randomResource RandomResource
 			if err := json.Unmarshal(body, &randomResource); err != nil {
-				log.Panic(err)
+				erRrr = err
+				return
 			}
 			results = append(results, randomResource)
 		}()
@@ -42,5 +63,5 @@ func GetRandomResource(command string, query string) []RandomResource {
 
 	wg.Wait()
 
-	return results
+	return results, erRrr
 }
