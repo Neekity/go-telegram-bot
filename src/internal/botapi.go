@@ -74,3 +74,7 @@ func sendMessage(bot *tgbotapi.BotAPI, chatId int64, msg tgbotapi.Chattable) {
 		SendError(bot, chatId, err)
 	}
 }
+
+func SendButton(bot *tgbotapi.BotAPI, chatId int64) {
+
+}
